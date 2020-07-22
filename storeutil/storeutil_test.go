@@ -1,6 +1,7 @@
 package storeutil
 
 import (
+	"context"
 	"io/ioutil"
 	"testing"
 
@@ -15,9 +16,10 @@ import (
 )
 
 func TestLoader(t *testing.T) {
+	ctx := context.Background()
 	store := bstore.NewBlockstore(dss.MutexWrap(datastore.NewMapDatastore()))
 	blk := testutil.GenerateBlocksOfSize(1, 1000)[0]
-	err := store.Put(blk)
+	err := store.Put(ctx, blk)
 	if err != nil {
 		t.Fatal("Unable to put block to store")
 	}
@@ -37,6 +39,7 @@ func TestLoader(t *testing.T) {
 }
 
 func TestStorer(t *testing.T) {
+	ctx := context.Background()
 	store := bstore.NewBlockstore(dss.MutexWrap(datastore.NewMapDatastore()))
 	blk := testutil.GenerateBlocksOfSize(1, 1000)[0]
 	storer := StorerForBlockstore(store)
@@ -52,7 +55,7 @@ func TestStorer(t *testing.T) {
 	if err != nil {
 		t.Fatal("Unable to commit with storer function")
 	}
-	_, err = store.Get(blk.Cid())
+	_, err = store.Get(ctx, blk.Cid())
 	if err != nil {
 		t.Fatal("Block not written to store")
 	}
